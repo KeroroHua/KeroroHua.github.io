@@ -379,6 +379,40 @@ footer p{line-height:2}
   #cyber-bg{display:none}
   .scroll-hint{display:none}
 }
+
+/* ===== 点击名言弹窗 ===== */
+#quotePop{
+  position:fixed;
+  z-index:9999;
+  pointer-events:none;
+  padding:12px 20px;
+  font-family:"Orbitron","Noto Sans SC",system-ui,sans-serif;
+  font-size:17px;
+  letter-spacing:.05em;
+  color:#00e5ff;
+  background:rgba(5,8,18,.88);
+  border:1px solid rgba(0,229,255,.55);
+  border-radius:10px;
+  box-shadow:0 0 20px rgba(0,229,255,.35), inset 0 0 14px rgba(0,229,255,.08);
+  opacity:0;
+  transform:translate(-50%, 26px) scale(.94);
+  transition:opacity .3s ease, transform .3s ease;
+  max-width:min(76vw, 540px);
+  word-break:break-word;
+  text-shadow:0 0 10px rgba(0,229,255,.65);
+}
+#quotePop.show{
+  opacity:1;
+  transform:translate(-50%, 26px) scale(1);
+}
+#quotePop .q-speaker{
+  display:block;
+  margin-top:6px;
+  font-size:12px;
+  letter-spacing:.14em;
+  color:#b44dff;
+  text-shadow:0 0 8px rgba(180,77,255,.6);
+}
 </style>
 </head>
 <body>
@@ -504,73 +538,42 @@ footer p{line-height:2}
 </footer>
 
 <script>
-/* ===== 霓虹名言雨背景（Rick & Morty） ===== */
+/* ===== 霓虹数字雨背景 ===== */
 (function(){
   var canvas = document.getElementById("cyber-bg");
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(!canvas || reduce) return;
   var ctx = canvas.getContext("2d");
   var W, H, fontSize = 16;
-  var SPEED = 0.18; // 名言下落速度（格/帧，越小越慢）
-  var MAX_DROPS = 15; // 同时存在的雨流数量
-  var QUOTES = [
-    "Wubba Lubba Dub Dub",
-    "Nobody exists on purpose",
-    "To live is to risk it all",
-    "Sometimes science is more art than science",
-    "Your boos mean nothing to me",
-    "Get Schwifty",
-    "Aw, jeez",
-    "That's the way the cookie crumbles",
-    "The universe is basically an animal",
-    "I'm a scientist because I want to impress girls",
-    "Don't think about it, Morty",
-    "Come watch TV",
-    "It's a lot of work being a genius",
-    "GRASS... tastes bad!"
-  ];
-  var drops = [];
+  var SPEED = 0.18; // 数字雨下落速度（格/帧，越小越慢）
+  var DENSITY = 0.38; // 活跃列比例（越小越稀疏）
+  var chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF<>/\\|{}[]+=*#@$%&";
+  var cols = [];
   function resize(){
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
-  }
-  function spawnDrop(){
-    var t = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-    return {
-      x: Math.floor(Math.random() * (W / fontSize)),
-      y: -1 - Math.floor(Math.random() * 24),
-      text: t
-    };
+    var n = Math.floor(W / fontSize);
+    cols = new Array(n);
+    for(var i = 0; i < n; i++){
+      cols[i] = Math.random() < DENSITY ? (Math.random() * H / fontSize) : -1;
+    }
   }
   resize();
   window.addEventListener("resize", resize);
-  for(var i = 0; i < MAX_DROPS; i++) drops.push(spawnDrop());
   function draw(){
     ctx.fillStyle = "rgba(5,6,13,0.10)";
     ctx.fillRect(0, 0, W, H);
     ctx.font = fontSize + "px Consolas, monospace";
-    for(var i = 0; i < drops.length; i++){
-      var d = drops[i];
-      var x = d.x * fontSize;
-      var n = d.text.length;
-      for(var j = 0; j < n; j++){
-        var ci = Math.floor(d.y) - j; // 头部为最新字符，尾巴向上
-        if(ci < 0 || ci >= n) continue;
-        var y = (d.y - j) * fontSize;
-        if(y < 0 || y > H) continue;
-        var ch = d.text[ci];
-        var r = Math.random();
-        if(j === 0){
-          ctx.fillStyle = r > 0.9 ? "#ff2d95" : "#00e5ff";
-        }else{
-          ctx.fillStyle = "rgba(0,229,255," + Math.max(0.35, 0.8 - j * 0.07) + ")";
-        }
-        ctx.fillText(ch, x, y);
-      }
-      d.y += SPEED;
-      if(d.y - n > H / fontSize){
-        drops[i] = spawnDrop();
-      }
+    for(var i = 0; i < cols.length; i++){
+      if(cols[i] < 0) continue;
+      var ch = chars[Math.floor(Math.random() * chars.length)];
+      var x = i * fontSize;
+      var y = cols[i] * fontSize;
+      var r = Math.random();
+      ctx.fillStyle = r > 0.975 ? "#ff2d95" : (r > 0.5 ? "#00e5ff" : "#3a4a8a");
+      ctx.fillText(ch, x, y);
+      if(y > H && r > 0.975) cols[i] = Math.random() < DENSITY ? 0 : -1;
+      cols[i] += SPEED;
     }
   }
   (function loop(){
@@ -578,6 +581,43 @@ footer p{line-height:2}
     requestAnimationFrame(loop);
   })();
 })();
+
+
+/* ===== 点击名言：Rick & Morty 台词 ===== */
+document.addEventListener("DOMContentLoaded", function(){
+  var QUOTES = [
+    "Wubba Lubba Dub Dub!",
+    "Nobody exists on purpose. Nobody belongs anywhere. Everybody's gonna die. Come watch TV?",
+    "To live is to risk it all. Otherwise you're just an inert chunk of randomly assembled molecules drifting wherever the universe blows you.",
+    "Sometimes science is more art than science, Morty.",
+    "Your boos mean nothing to me, I've seen what makes you cheer.",
+    "Get Schwifty!",
+    "Aw, jeez...",
+    "That's the way the cookie crumbles.",
+    "The universe is basically an animal. It grazes on the ordinary.",
+    "I'm a scientist because I want to impress girls.",
+    "Don't think about it, Morty. Just don't think about it.",
+    "It's a lot of work being a genius, Morty.",
+    "GRASS... tastes bad!",
+    "Come watch TV?",
+    "Wubba lubba dub dub!"
+  ];
+  var SPEAKERS = ["— Rick", "— Morty", "— Rick", "— Morty"];
+  var el = document.getElementById("quotePop");
+  if(!el) return;
+  var last = -1, timer = null;
+  document.addEventListener("click", function(e){
+    var idx;
+    do{ idx = Math.floor(Math.random() * QUOTES.length); }while(idx === last && QUOTES.length > 1);
+    last = idx;
+    el.innerHTML = QUOTES[idx] + '<span class="q-speaker">' + SPEAKERS[Math.floor(Math.random() * SPEAKERS.length)] + '</span>';
+    el.style.left = e.clientX + "px";
+    el.style.top = e.clientY + "px";
+    el.classList.add("show");
+    clearTimeout(timer);
+    timer = setTimeout(function(){ el.classList.remove("show"); }, 3200);
+  });
+});
 
 /* ===== 博文数据 ===== */
 
@@ -1647,5 +1687,8 @@ document.addEventListener("DOMContentLoaded", function(){
   </div>
 </div>
 
+
+<!-- ===== 点击名言弹窗 ===== -->
+<div id="quotePop" aria-live="polite"></div>
 </body>
 </html>
