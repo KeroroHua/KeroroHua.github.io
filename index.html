@@ -385,13 +385,13 @@ footer p{line-height:2}
   position:fixed;
   z-index:9999;
   pointer-events:none;
-  font-family:"Orbitron","Noto Sans SC",system-ui,sans-serif;
-  font-size:14px;
-  letter-spacing:.05em;
-  line-height:1.55;
+  font-family:"Noto Sans SC","Orbitron",system-ui,sans-serif;
+  font-size:13px;
+  letter-spacing:.03em;
+  line-height:1.5;
   font-weight:500;
   color:#bff7ff;
-  text-shadow:0 0 12px rgba(0,229,255,.5), 0 0 28px rgba(0,229,255,.25);
+  text-shadow:0 0 10px rgba(0,229,255,.45), 0 0 24px rgba(0,229,255,.22);
   opacity:0;
   transition:opacity .25s ease;
   max-width:min(72vw, 560px);
@@ -400,10 +400,23 @@ footer p{line-height:2}
 .quotePop.show{
   opacity:1;
 }
+.quotePop .q-en{
+  display:block;
+  font-family:"Orbitron","Noto Sans SC",sans-serif;
+  font-size:13px;
+  color:#d8fbff;
+}
+.quotePop .q-cn{
+  display:block;
+  margin-top:2px;
+  font-size:13px;
+  color:#9fd8ff;
+  text-shadow:0 0 8px rgba(0,229,255,.3);
+}
 .quotePop .q-speaker{
   display:block;
   margin-top:3px;
-  font-size:11px;
+  font-size:10px;
   letter-spacing:.16em;
   color:#c9a6ff;
   text-shadow:0 0 8px rgba(180,77,255,.45);
@@ -666,21 +679,20 @@ footer p{line-height:2}
 /* ===== 点击名言：Rick & Morty 台词（每次点击独立弹窗） ===== */
 document.addEventListener("DOMContentLoaded", function(){
   var QUOTES = [
-    "Wubba Lubba Dub Dub!",
-    "Nobody exists on purpose. Nobody belongs anywhere. Everybody's gonna die. Come watch TV?",
-    "To live is to risk it all. Otherwise you're just an inert chunk of randomly assembled molecules drifting wherever the universe blows you.",
-    "Sometimes science is more art than science, Morty.",
-    "Your boos mean nothing to me, I've seen what makes you cheer.",
-    "Get Schwifty!",
-    "Aw, jeez...",
-    "That's the way the cookie crumbles.",
-    "The universe is basically an animal. It grazes on the ordinary.",
-    "I'm a scientist because I want to impress girls.",
-    "Don't think about it, Morty. Just don't think about it.",
-    "It's a lot of work being a genius, Morty.",
-    "GRASS... tastes bad!",
-    "Come watch TV?",
-    "Wubba lubba dub dub!"
+    {en:"Wubba Lubba Dub Dub!", cn:"我很痛苦，请救救我。"},
+    {en:"Nobody exists on purpose. Nobody belongs anywhere. Everybody's gonna die. Come watch TV?", cn:"人的出现是没有目的的，不属于任何地方，每个人都会死。来吧，一起看电视吧。"},
+    {en:"To live is to risk it all. Otherwise you're just an inert chunk of randomly assembled molecules drifting wherever the universe blows you.", cn:"生活就是要敢于冒险，否则你就称不上生命，只是一团随机排布的分子，在宇宙中随波逐流。"},
+    {en:"Sometimes science is more art than science, Morty.", cn:"莫蒂，科学有时候更像一门艺术，而不只是科学。"},
+    {en:"Your boos mean nothing to me, I've seen what makes you cheer.", cn:"你的嘘声对我毫无意义，因为我见过你们为之欢呼的样子。"},
+    {en:"Get Schwifty!", cn:"嗨起来吧！"},
+    {en:"Aw, jeez...", cn:"唉，天哪……"},
+    {en:"That's the way the cookie crumbles.", cn:"人生就是这样，世事难料。"},
+    {en:"The universe is basically an animal. It grazes on the ordinary.", cn:"宇宙本质上是一头野兽，以平庸之人为食。"},
+    {en:"I'm a scientist because I want to impress girls.", cn:"我当科学家，就是为了吸引女孩。"},
+    {en:"Don't think about it, Morty. Just don't think about it.", cn:"别想那么多了，莫蒂，别想那么多。"},
+    {en:"It's a lot of work being a genius, Morty.", cn:"当个天才很累的，莫蒂。"},
+    {en:"GRASS... tastes bad!", cn:"草……真难吃！"},
+    {en:"Come watch TV?", cn:"过来一起看电视？"}
   ];
   var SPEAKERS = ["— Rick", "— Morty", "— Rick", "— Morty"];
   var last = -1;
@@ -688,9 +700,10 @@ document.addEventListener("DOMContentLoaded", function(){
     var idx;
     do{ idx = Math.floor(Math.random() * QUOTES.length); }while(idx === last && QUOTES.length > 1);
     last = idx;
+    var q = QUOTES[idx];
     var el = document.createElement("div");
     el.className = "quotePop";
-    el.innerHTML = QUOTES[idx] + '<span class="q-speaker">' + SPEAKERS[Math.floor(Math.random() * SPEAKERS.length)] + '</span>';
+    el.innerHTML = '<span class="q-en">' + q.en + '</span><span class="q-cn">' + q.cn + '</span><span class="q-speaker">' + SPEAKERS[Math.floor(Math.random() * SPEAKERS.length)] + '</span>';
     // 随机错位，避免多次点击完全重叠
     el.style.left = (e.clientX + Math.floor(Math.random() * 60 - 30)) + "px";
     el.style.top = (e.clientY + 24 + Math.floor(Math.random() * 40)) + "px";
@@ -699,7 +712,7 @@ document.addEventListener("DOMContentLoaded", function(){
     setTimeout(function(){
       el.classList.remove("show");
       setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 320);
-    }, 1500);
+    }, 1000);
   });
 });
 
