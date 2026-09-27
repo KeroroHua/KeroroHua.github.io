@@ -380,37 +380,34 @@ footer p{line-height:2}
   .scroll-hint{display:none}
 }
 
-/* ===== 点击名言弹窗 ===== */
-#quotePop{
+/* ===== 点击名言弹窗（多实例） ===== */
+.quotePop{
   position:fixed;
   z-index:9999;
   pointer-events:none;
   font-family:"Orbitron","Noto Sans SC",system-ui,sans-serif;
-  font-size:20px;
-  letter-spacing:.06em;
+  font-size:14px;
+  letter-spacing:.05em;
   line-height:1.55;
   font-weight:500;
   color:#bff7ff;
-  text-shadow:0 0 14px rgba(0,229,255,.55), 0 0 34px rgba(0,229,255,.28);
+  text-shadow:0 0 12px rgba(0,229,255,.5), 0 0 28px rgba(0,229,255,.25);
   opacity:0;
-  transform:translate(-50%, 30px);
-  transition:opacity .3s ease;
+  transition:opacity .25s ease;
   max-width:min(72vw, 560px);
   word-break:break-word;
 }
-#quotePop.show{
+.quotePop.show{
   opacity:1;
 }
-#quotePop .q-speaker{
+.quotePop .q-speaker{
   display:block;
-  margin-top:4px;
-  font-size:13px;
+  margin-top:3px;
+  font-size:11px;
   letter-spacing:.16em;
   color:#c9a6ff;
-  text-shadow:0 0 10px rgba(180,77,255,.5);
+  text-shadow:0 0 8px rgba(180,77,255,.45);
 }
-
-
 /* ===== MENU 按钮 + 侧滑菜单 ===== */
 .menu-btn{
   display:flex;flex-direction:column;justify-content:center;gap:4px;
@@ -666,7 +663,7 @@ footer p{line-height:2}
 })();
 
 
-/* ===== 点击名言：Rick & Morty 台词 ===== */
+/* ===== 点击名言：Rick & Morty 台词（每次点击独立弹窗） ===== */
 document.addEventListener("DOMContentLoaded", function(){
   var QUOTES = [
     "Wubba Lubba Dub Dub!",
@@ -686,19 +683,23 @@ document.addEventListener("DOMContentLoaded", function(){
     "Wubba lubba dub dub!"
   ];
   var SPEAKERS = ["— Rick", "— Morty", "— Rick", "— Morty"];
-  var el = document.getElementById("quotePop");
-  if(!el) return;
-  var last = -1, timer = null;
+  var last = -1;
   document.addEventListener("click", function(e){
     var idx;
     do{ idx = Math.floor(Math.random() * QUOTES.length); }while(idx === last && QUOTES.length > 1);
     last = idx;
+    var el = document.createElement("div");
+    el.className = "quotePop";
     el.innerHTML = QUOTES[idx] + '<span class="q-speaker">' + SPEAKERS[Math.floor(Math.random() * SPEAKERS.length)] + '</span>';
-    el.style.left = e.clientX + "px";
-    el.style.top = e.clientY + "px";
-    el.classList.add("show");
-    clearTimeout(timer);
-    timer = setTimeout(function(){ el.classList.remove("show"); }, 2700);
+    // 随机错位，避免多次点击完全重叠
+    el.style.left = (e.clientX + Math.floor(Math.random() * 60 - 30)) + "px";
+    el.style.top = (e.clientY + 24 + Math.floor(Math.random() * 40)) + "px";
+    document.body.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add("show"); });
+    setTimeout(function(){
+      el.classList.remove("show");
+      setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 320);
+    }, 1500);
   });
 });
 
@@ -1787,8 +1788,6 @@ document.addEventListener("DOMContentLoaded", function(){
 </div>
 
 
-<!-- ===== 点击名言弹窗 ===== -->
-<div id="quotePop" aria-live="polite"></div>
 
 <!-- ===== MENU 侧滑菜单 ===== -->
 <div class="side-menu-mask" id="sideMenuMask"></div>
