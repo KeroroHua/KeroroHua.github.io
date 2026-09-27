@@ -392,13 +392,10 @@ footer p{line-height:2}
   color:#bff7ff;
   text-shadow:0 0 10px rgba(0,229,255,.45), 0 0 24px rgba(0,229,255,.22);
   opacity:0;
-  transition:opacity .25s ease;
   max-width:min(72vw, 560px);
   word-break:break-word;
 }
-.quotePop.show{
-  opacity:1;
-}
+
 .quotePop .q-en{
   display:block;
   font-family:"Orbitron","Noto Sans SC",sans-serif;
@@ -755,11 +752,27 @@ document.addEventListener("DOMContentLoaded", function(){
     el.style.left = (e.clientX + Math.floor(Math.random() * 60 - 30)) + "px";
     el.style.top = (e.clientY + 24 + Math.floor(Math.random() * 40)) + "px";
     document.body.appendChild(el);
-    requestAnimationFrame(function(){ el.classList.add("show"); });
-    setTimeout(function(){
-      el.classList.remove("show");
-      setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 320);
-    }, 1000);
+    // JS 自驱动动画：淡入上浮 -> 上飘淡出（总 1.5s，内联样式不受 prefers-reduced-motion 影响）
+    var t0 = performance.now();
+    var DUR = 1500, IN = 280;
+    (function tick(){
+      var t = performance.now() - t0;
+      var p = Math.min(t / DUR, 1);
+      var y, op;
+      if(t <= IN){
+        var ip = t / IN;
+        op = ip;
+        y = 12 - 12 * ip;
+      } else {
+        var out = (t - IN) / (DUR - IN);
+        op = Math.max(1 - out, 0);
+        y = -(out * 130);
+      }
+      el.style.opacity = op.toFixed(3);
+      el.style.transform = "translateY(" + y.toFixed(1) + "px)";
+      if(p < 1){ requestAnimationFrame(tick); }
+      else{ setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 30); }
+    })();
   });
 });
 
