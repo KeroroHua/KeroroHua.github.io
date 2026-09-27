@@ -1502,7 +1502,7 @@ renderLists();
 navigate();
 
 /* ===== 换图面板：本地上传（localStorage 持久化） ===== */
-(function(){
+document.addEventListener("DOMContentLoaded", function(){
   var LS_HERO = "keroro_cyber_hero", LS_AVATAR = "keroro_cyber_avatar";
   var mask = document.getElementById("imgPanelMask");
   if(!mask) return;
@@ -1570,7 +1570,7 @@ navigate();
   document.addEventListener("keydown", function(e){ if(e.key === "Escape") mask.classList.remove("open"); });
 
   applyStored();
-})();
+});
 
 </script>
 
