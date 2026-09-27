@@ -410,6 +410,96 @@ footer p{line-height:2}
   text-shadow:0 0 10px rgba(180,77,255,.5);
 }
 
+
+/* ===== MENU 按钮 + 侧滑菜单 ===== */
+.menu-btn{
+  display:flex;flex-direction:column;justify-content:center;gap:4px;
+  width:36px;height:36px;padding:7px;margin-right:12px;
+  background:transparent;border:1px solid var(--line);border-radius:6px;
+  cursor:pointer;transition:border-color .25s, box-shadow .25s;
+}
+.menu-btn span{
+  display:block;height:2px;width:100%;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  transition:transform .3s, background .3s;
+}
+.menu-btn:hover{border-color:var(--cyan);box-shadow:var(--shadow-cyan)}
+.menu-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg);background:var(--pink)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);background:var(--pink)}
+
+.side-menu-mask{
+  position:fixed;inset:0;z-index:80;background:rgba(2,4,10,.55);
+  opacity:0;visibility:hidden;transition:opacity .3s, visibility .3s;
+}
+.side-menu-mask.open{opacity:1;visibility:visible}
+.side-menu{
+  position:fixed;top:0;left:0;bottom:0;z-index:81;
+  width:min(320px,86vw);
+  padding:76px 26px 28px;
+  background:linear-gradient(160deg,rgba(10,14,26,.97),rgba(5,7,16,.97));
+  border-right:1px solid var(--line);
+  box-shadow:8px 0 30px rgba(0,0,0,.45);
+  transform:translateX(-102%);
+  transition:transform .35s cubic-bezier(.22,1,.36,1);
+  display:flex;flex-direction:column;gap:22px;overflow-y:auto;
+}
+.side-menu.open{transform:translateX(0)}
+.side-menu::after{
+  content:"";position:absolute;right:-1px;top:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,var(--cyan),var(--purple),var(--pink));
+  box-shadow:0 0 12px rgba(0,229,255,.4);
+}
+.side-menu .sm-brand{
+  font-family:"Orbitron","Noto Sans SC",sans-serif;
+  font-weight:900;font-size:22px;letter-spacing:.14em;
+  color:var(--cyan);text-shadow:var(--shadow-cyan);
+}
+.side-menu .sm-brand em{font-style:normal;color:var(--purple);text-shadow:var(--shadow-purple)}
+.side-menu .sm-sub{font-size:12px;letter-spacing:.22em;color:var(--dim);margin-top:2px}
+.side-menu .sm-sec{
+  font-size:11px;letter-spacing:.26em;color:var(--pink);
+  text-shadow:var(--shadow-pink);border-bottom:1px solid var(--line2);
+  padding-bottom:6px;margin-bottom:2px;
+}
+.side-menu .sm-nav{display:flex;flex-direction:column;gap:4px}
+.side-menu .sm-nav a{
+  position:relative;display:block;padding:10px 12px;border-radius:6px;
+  font-size:15px;letter-spacing:.08em;color:var(--text);
+  transition:color .2s, background .2s, padding-left .2s;
+}
+.side-menu .sm-nav a::before{
+  content:">>";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  color:var(--cyan);opacity:0;transition:opacity .2s;
+}
+.side-menu .sm-nav a:hover,.side-menu .sm-nav a.active{
+  color:var(--cyan);background:rgba(0,229,255,.08);padding-left:28px;
+}
+.side-menu .sm-nav a:hover::before,.side-menu .sm-nav a.active::before{opacity:1}
+.side-menu .sm-card{
+  display:flex;align-items:center;gap:12px;padding:12px;
+  background:rgba(0,229,255,.05);border:1px solid var(--line);border-radius:10px;
+}
+.side-menu .sm-card img{
+  width:46px;height:46px;border-radius:50%;object-fit:cover;
+  border:1px solid var(--cyan);box-shadow:var(--shadow-cyan);
+}
+.side-menu .sm-card b{display:block;font-size:14px;letter-spacing:.05em;color:var(--text)}
+.side-menu .sm-card span{font-size:12px;color:var(--dim);line-height:1.6}
+.side-menu .sm-links{display:flex;flex-direction:column;gap:8px}
+.side-menu .sm-links a{
+  display:flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.06em;
+  color:var(--dim);transition:color .2s, text-shadow .2s;
+}
+.side-menu .sm-links a:hover{color:var(--cyan);text-shadow:var(--shadow-cyan)}
+.side-menu .sm-links a::before{content:"▸";color:var(--purple)}
+.side-menu .sm-foot{
+  margin-top:auto;font-size:11px;color:var(--dim);letter-spacing:.12em;line-height:2;
+}
+.side-menu .sm-foot .tag{
+  display:inline-block;margin-right:6px;padding:2px 8px;font-size:10px;
+  border:1px solid var(--line2);border-radius:999px;color:var(--purple);
+}
 </style>
 </head>
 <body>
@@ -420,6 +510,7 @@ footer p{line-height:2}
 <div class="scanlines"></div>
 
 <nav class="nav" aria-label="主导航">
+  <button class="menu-btn" id="openSideMenu" type="button" aria-label="打开菜单"><span></span><span></span><span></span></button>
   <a class="brand" href="#/home">KERORO<em>HUA</em></a>
   <div class="nav-links">
     <a href="#/home" data-route="home" class="active">首页</a>
@@ -1573,6 +1664,22 @@ navigate();
 
 /* ===== 换图面板：本地上传（localStorage 持久化） ===== */
 document.addEventListener("DOMContentLoaded", function(){
+  var sideBtn = document.getElementById("openSideMenu");
+  var sideMenu = document.getElementById("sideMenu");
+  var sideMask = document.getElementById("sideMenuMask");
+  function setSide(open){
+    if(sideBtn) sideBtn.classList.toggle("open", open);
+    if(sideMenu) sideMenu.classList.toggle("open", open);
+    if(sideMask) sideMask.classList.toggle("open", open);
+  }
+  if(sideBtn) sideBtn.addEventListener("click", function(){ setSide(true); });
+  if(sideMask) sideMask.addEventListener("click", function(){ setSide(false); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape") setSide(false); });
+  var smOpenImg = document.getElementById("smOpenImg");
+  if(smOpenImg) smOpenImg.addEventListener("click", function(){
+    setSide(false);
+    setTimeout(function(){ var m = document.getElementById("imgPanelMask"); if(m) m.classList.add("open"); }, 250);
+  });
   var LS_HERO = "keroro_cyber_hero", LS_AVATAR = "keroro_cyber_avatar";
   var mask = document.getElementById("imgPanelMask");
   if(!mask) return;
@@ -1682,5 +1789,37 @@ document.addEventListener("DOMContentLoaded", function(){
 
 <!-- ===== 点击名言弹窗 ===== -->
 <div id="quotePop" aria-live="polite"></div>
+
+<!-- ===== MENU 侧滑菜单 ===== -->
+<div class="side-menu-mask" id="sideMenuMask"></div>
+<aside class="side-menu" id="sideMenu" aria-label="站点菜单">
+  <div class="sm-brand">KERORO<em>HUA</em></div>
+  <div class="sm-sub">技術宅、世界を救う</div>
+
+  <div class="sm-sec">NAVIGATION // 导航</div>
+  <nav class="sm-nav">
+    <a href="#/home" data-route="home">首页</a>
+    <a href="#/posts" data-route="posts">博文</a>
+    <a href="#/about" data-route="about">关于我</a>
+  </nav>
+
+  <div class="sm-sec">IDENTITY // 操作者</div>
+  <div class="sm-card">
+    <img src="assets/avatar.jpg" alt="KeroroHua">
+    <div><b>KeroroHua</b><span>技术宅 · 二次元常驻 · 偶尔拯救世界</span></div>
+  </div>
+
+  <div class="sm-sec">LINK // 链接</div>
+  <div class="sm-links">
+    <a href="https://github.com/KeroroHua" target="_blank" rel="noopener">GitHub</a>
+    <a href="#/about">关于本机</a>
+    <a href="javascript:void(0)" id="smOpenImg">换图面板</a>
+  </div>
+
+  <div class="sm-foot">
+    <span class="tag">CYBER</span><span class="tag">ANIME</span><span class="tag">NO WAY BACK</span>
+    <br>KEROROHUA // 技術宅、世界を救う
+  </div>
+</aside>
 </body>
 </html>
