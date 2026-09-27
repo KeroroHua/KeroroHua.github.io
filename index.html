@@ -511,6 +511,7 @@ footer p{line-height:2}
   if(!canvas || reduce) return;
   var ctx = canvas.getContext("2d");
   var W, H, cols = [], fontSize = 16;
+  var SPEED = 0.4; // 数字雨下落速度（1 = 每帧一格，越小越慢）
   var chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF<>/\\|{}[]+=*#@$%&";
   function resize(){
     W = canvas.width = window.innerWidth;
@@ -532,7 +533,7 @@ footer p{line-height:2}
       ctx.fillStyle = r > 0.975 ? "#ff2d95" : (r > 0.5 ? "#00e5ff" : "#3a4a8a");
       ctx.fillText(ch, x, y);
       if(y > H && r > 0.975) cols[i] = 0;
-      cols[i]++;
+      cols[i] += SPEED;
     }
   }
   (function loop(){
