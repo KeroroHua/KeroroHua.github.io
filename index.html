@@ -385,34 +385,31 @@ footer p{line-height:2}
   position:fixed;
   z-index:9999;
   pointer-events:none;
-  padding:12px 20px;
   font-family:"Orbitron","Noto Sans SC",system-ui,sans-serif;
-  font-size:17px;
-  letter-spacing:.05em;
-  color:#00e5ff;
-  background:rgba(5,8,18,.88);
-  border:1px solid rgba(0,229,255,.55);
-  border-radius:10px;
-  box-shadow:0 0 20px rgba(0,229,255,.35), inset 0 0 14px rgba(0,229,255,.08);
+  font-size:20px;
+  letter-spacing:.06em;
+  line-height:1.55;
+  font-weight:500;
+  color:#bff7ff;
+  text-shadow:0 0 14px rgba(0,229,255,.55), 0 0 34px rgba(0,229,255,.28);
   opacity:0;
-  transform:translate(-50%, 26px) scale(.94);
-  transition:opacity .3s ease, transform .3s ease;
-  max-width:min(76vw, 540px);
+  transform:translate(-50%, 30px);
+  transition:opacity .3s ease;
+  max-width:min(72vw, 560px);
   word-break:break-word;
-  text-shadow:0 0 10px rgba(0,229,255,.65);
 }
 #quotePop.show{
   opacity:1;
-  transform:translate(-50%, 26px) scale(1);
 }
 #quotePop .q-speaker{
   display:block;
-  margin-top:6px;
-  font-size:12px;
-  letter-spacing:.14em;
-  color:#b44dff;
-  text-shadow:0 0 8px rgba(180,77,255,.6);
+  margin-top:4px;
+  font-size:13px;
+  letter-spacing:.16em;
+  color:#c9a6ff;
+  text-shadow:0 0 10px rgba(180,77,255,.5);
 }
+
 </style>
 </head>
 <body>
@@ -546,17 +543,13 @@ footer p{line-height:2}
   var ctx = canvas.getContext("2d");
   var W, H, fontSize = 16;
   var SPEED = 0.18; // 数字雨下落速度（格/帧，越小越慢）
-  var DENSITY = 0.38; // 活跃列比例（越小越稀疏）
   var chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF<>/\\|{}[]+=*#@$%&";
   var cols = [];
   function resize(){
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
     var n = Math.floor(W / fontSize);
-    cols = new Array(n);
-    for(var i = 0; i < n; i++){
-      cols[i] = Math.random() < DENSITY ? (Math.random() * H / fontSize) : -1;
-    }
+    cols = new Array(n).fill(0);
   }
   resize();
   window.addEventListener("resize", resize);
@@ -565,14 +558,13 @@ footer p{line-height:2}
     ctx.fillRect(0, 0, W, H);
     ctx.font = fontSize + "px Consolas, monospace";
     for(var i = 0; i < cols.length; i++){
-      if(cols[i] < 0) continue;
       var ch = chars[Math.floor(Math.random() * chars.length)];
       var x = i * fontSize;
       var y = cols[i] * fontSize;
       var r = Math.random();
       ctx.fillStyle = r > 0.975 ? "#ff2d95" : (r > 0.5 ? "#00e5ff" : "#3a4a8a");
       ctx.fillText(ch, x, y);
-      if(y > H && r > 0.975) cols[i] = Math.random() < DENSITY ? 0 : -1;
+      if(y > H && r > 0.975) cols[i] = 0;
       cols[i] += SPEED;
     }
   }
@@ -615,7 +607,7 @@ document.addEventListener("DOMContentLoaded", function(){
     el.style.top = e.clientY + "px";
     el.classList.add("show");
     clearTimeout(timer);
-    timer = setTimeout(function(){ el.classList.remove("show"); }, 3200);
+    timer = setTimeout(function(){ el.classList.remove("show"); }, 2700);
   });
 });
 
