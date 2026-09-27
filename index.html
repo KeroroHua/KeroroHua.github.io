@@ -555,6 +555,21 @@ footer p{line-height:2}
 @media (hover:none), (pointer:coarse){
   .neo-cursor, .neo-trail{display:none !important}
 }
+
+/* ===== 禁止装饰文字被选中（内容区保留可复制） ===== */
+body{
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+}
+.post-body, .post-content, .blog-content, .post-detail, pre, code,
+.input, input, textarea, select, .code{
+  -webkit-user-select:text;
+  -moz-user-select:text;
+  -ms-user-select:text;
+  user-select:text;
+}
 </style>
 </head>
 <body>
