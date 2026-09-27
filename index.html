@@ -510,6 +510,55 @@ footer p{line-height:2}
   display:inline-block;margin-right:6px;padding:2px 8px;font-size:10px;
   border:1px solid var(--line2);border-radius:999px;color:var(--purple);
 }
+
+/* ===== 霓虹二次元光标 ===== */
+@media (hover:hover) and (pointer:fine){
+  body, a, button, .btn, .nav-links a, .sm-nav a, .side-menu .sm-links a,
+  .img-btn, .menu-btn, label.file-btn, .sm-links a, .side-menu .sm-nav a{
+    cursor:none;
+  }
+  input, textarea, select{ cursor:auto; }
+}
+.neo-cursor{
+  position:fixed;left:0;top:0;z-index:99999;pointer-events:none;
+}
+.neo-cursor .core{
+  position:absolute;width:10px;height:10px;
+  transform:translate(-50%,-50%) rotate(45deg);
+  background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan), 0 0 18px rgba(0,229,255,.7);
+  transition:opacity .3s;
+}
+.neo-cursor .ring{
+  position:absolute;width:20px;height:20px;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(0,229,255,.75);
+  border-radius:50%;
+  box-shadow:0 0 10px rgba(0,229,255,.35), inset 0 0 8px rgba(0,229,255,.25);
+  transition:width .18s ease, height .18s ease, border-color .18s ease;
+}
+.neo-cursor.hover .ring{
+  width:32px;height:32px;border-color:var(--pink);
+  box-shadow:0 0 14px rgba(255,45,149,.4), inset 0 0 10px rgba(255,45,149,.3);
+}
+.neo-cursor.hover .core{background:var(--pink);box-shadow:0 0 10px var(--pink), 0 0 20px rgba(255,45,149,.7)}
+.neo-cursor.pulse .ring{
+  animation:neoPulse .45s ease-out forwards;
+}
+@keyframes neoPulse{
+  0%{width:20px;height:20px;opacity:1;border-color:var(--cyan)}
+  100%{width:56px;height:56px;opacity:0;border-color:var(--pink)}
+}
+.neo-trail{
+  position:fixed;left:0;top:0;width:7px;height:7px;border-radius:50%;
+  pointer-events:none;z-index:99998;opacity:.75;
+}
+.neo-trail.t1{background:rgba(0,229,255,.55);box-shadow:0 0 8px rgba(0,229,255,.6);transition:left .12s linear, top .12s linear}
+.neo-trail.t2{background:rgba(180,77,255,.5);box-shadow:0 0 8px rgba(180,77,255,.5);transition:left .22s linear, top .22s linear}
+.neo-trail.t3{background:rgba(255,45,149,.45);box-shadow:0 0 8px rgba(255,45,149,.5);transition:left .32s linear, top .32s linear}
+@media (hover:none), (pointer:coarse){
+  .neo-cursor, .neo-trail{display:none !important}
+}
 </style>
 </head>
 <body>
@@ -1763,6 +1812,38 @@ document.addEventListener("DOMContentLoaded", function(){
   applyStored();
 });
 
+
+/* ===== 霓虹光标跟随 ===== */
+document.addEventListener("DOMContentLoaded", function(){
+  if(!window.matchMedia || !window.matchMedia("(hover: hover)").matches) return;
+  var main = document.getElementById("neoCursor");
+  if(!main) return;
+  var trails = [].slice.call(document.querySelectorAll(".neo-trail"));
+  var tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+  var mx = tx, my = ty;
+  document.addEventListener("mousemove", function(e){
+    mx = e.clientX; my = e.clientY;
+  });
+  document.addEventListener("mouseover", function(e){
+    var t = e.target;
+    var interactive = t && (t.closest("a") || t.closest("button") || t.closest(".btn") || t.closest("label"));
+    main.classList.toggle("hover", !!interactive);
+  });
+  document.addEventListener("mousedown", function(){ main.classList.add("pulse"); });
+  document.addEventListener("mouseup", function(){
+    setTimeout(function(){ main.classList.remove("pulse"); }, 460);
+  });
+  function loop(){
+    tx += (mx - tx) * 0.45; ty += (my - ty) * 0.45;
+    main.style.left = tx + "px"; main.style.top = ty + "px";
+    for(var i = 0; i < trails.length; i++){
+      trails[i].style.left = (tx - 3) + "px"; trails[i].style.top = (ty - 3) + "px";
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+});
+
 </script>
 
 <!-- ===== 换图面板 ===== -->
@@ -1833,5 +1914,11 @@ document.addEventListener("DOMContentLoaded", function(){
     <br>KEROROHUA // 技術宅、世界を救う
   </div>
 </aside>
+
+<!-- ===== 霓虹二次元光标 ===== -->
+<div class="neo-cursor" id="neoCursor" aria-hidden="true"><span class="core"></span><span class="ring"></span></div>
+<div class="neo-trail t1" aria-hidden="true"></div>
+<div class="neo-trail t2" aria-hidden="true"></div>
+<div class="neo-trail t3" aria-hidden="true"></div>
 </body>
 </html>
