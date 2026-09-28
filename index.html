@@ -270,7 +270,9 @@ a:hover{color:#8ff4ff;text-shadow:var(--shadow-cyan)}
 .post-body li{margin:6px 0}
 .post-body hr{border:none;height:1px;background:var(--line);margin:32px 0}
 .post-body em{color:var(--dim)}
-.post-body img{max-width:100%;border:1px solid var(--line);margin:10px 0}
+.post-body img{max-width:100%;border-radius:14px;border:1px solid rgba(0,229,255,.35);box-shadow:0 0 24px rgba(0,229,255,.15),0 12px 32px rgba(0,0,0,.45);margin:18px auto;display:block;animation:imgFade .9s ease both}
+@keyframes imgFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.post-body img{animation:none}}
 .post-back{margin:46px 0 20px}
 .post-back a{font-size:14px;letter-spacing:.14em;color:var(--purple)}
 .post-back a:hover{color:#fff}
