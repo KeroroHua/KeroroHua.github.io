@@ -573,57 +573,57 @@ body{
 
 /* ===== 霓虹音乐盒 ===== */
 .music-box{
-  position:fixed;right:18px;bottom:76px;z-index:9990;
-  display:flex;align-items:center;gap:10px;
-  padding:9px 14px;
-  background:rgba(8,10,20,.84);
-  border:1px solid rgba(0,229,255,.45);
+  position:fixed;right:14px;bottom:70px;z-index:9990;
+  display:flex;align-items:center;gap:6px;
+  padding:5px 9px;
+  background:rgba(8,10,20,.82);
+  border:1px solid rgba(0,229,255,.4);
   border-radius:999px;
-  box-shadow:0 0 14px rgba(0,229,255,.25), inset 0 0 12px rgba(0,229,255,.08);
+  box-shadow:0 0 10px rgba(0,229,255,.2), inset 0 0 8px rgba(0,229,255,.06);
   font-family:"Orbitron","Noto Sans SC",sans-serif;
-  color:#c9f6ff;letter-spacing:.05em;
+  color:#c9f6ff;letter-spacing:.04em;
 }
 .music-box .mb-btn{
-  width:30px;height:30px;border-radius:50%;
-  border:1px solid rgba(0,229,255,.6);
+  width:22px;height:22px;border-radius:50%;
+  border:1px solid rgba(0,229,255,.55);
   background:transparent;color:#00e5ff;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:all .18s ease;padding:0;
 }
-.music-box .mb-btn:hover{background:rgba(0,229,255,.15);box-shadow:0 0 12px rgba(0,229,255,.4)}
-.music-box .mb-btn svg{width:14px;height:14px;fill:currentColor}
+.music-box .mb-btn:hover{background:rgba(0,229,255,.15);box-shadow:0 0 8px rgba(0,229,255,.35)}
+.music-box .mb-btn svg{width:11px;height:11px;fill:currentColor}
 .music-box .mb-title{
-  max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  color:#bff7ff;font-size:11px;letter-spacing:.06em;
+  max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:#bff7ff;font-size:10px;letter-spacing:.05em;
 }
 .music-box .mb-vol{
-  width:62px;height:3px;-webkit-appearance:none;appearance:none;
+  width:42px;height:2px;-webkit-appearance:none;appearance:none;
   background:rgba(0,229,255,.25);border-radius:2px;outline:none;cursor:pointer;
 }
 .music-box .mb-vol::-webkit-slider-thumb{
-  -webkit-appearance:none;width:10px;height:10px;border-radius:50%;
-  background:#00e5ff;box-shadow:0 0 8px rgba(0,229,255,.8);cursor:pointer;
+  -webkit-appearance:none;width:8px;height:8px;border-radius:50%;
+  background:#00e5ff;box-shadow:0 0 6px rgba(0,229,255,.8);cursor:pointer;
 }
 .music-box .mb-vol::-moz-range-thumb{
-  width:10px;height:10px;border:none;border-radius:50%;
-  background:#00e5ff;box-shadow:0 0 8px rgba(0,229,255,.8);cursor:pointer;
+  width:8px;height:8px;border:none;border-radius:50%;
+  background:#00e5ff;box-shadow:0 0 6px rgba(0,229,255,.8);cursor:pointer;
 }
 .music-box.playing{
-  border-color:rgba(255,45,149,.6);
-  box-shadow:0 0 18px rgba(255,45,149,.35), inset 0 0 12px rgba(255,45,149,.1);
+  border-color:rgba(255,45,149,.55);
+  box-shadow:0 0 12px rgba(255,45,149,.3), inset 0 0 8px rgba(255,45,149,.08);
 }
-.music-box.playing .mb-btn{color:#ff2d95;border-color:rgba(255,45,149,.7)}
+.music-box.playing .mb-btn{color:#ff2d95;border-color:rgba(255,45,149,.65)}
 .music-box .mb-spin{
-  width:16px;height:16px;border-radius:50%;
+  width:11px;height:11px;border-radius:50%;
   border:2px solid rgba(0,229,255,.2);border-top-color:#00e5ff;
   animation:mbSpin 1s linear infinite;display:none;
 }
 .music-box.playing .mb-spin{display:block}
 @keyframes mbSpin{to{transform:rotate(360deg)}}
 @media (max-width:720px){
-  .music-box{right:10px;bottom:64px;padding:8px 10px;gap:8px}
-  .music-box .mb-vol{width:44px}
-  .music-box .mb-title{max-width:80px}
+  .music-box{right:8px;bottom:58px;padding:4px 7px;gap:5px}
+  .music-box .mb-vol{width:32px}
+  .music-box .mb-title{max-width:60px}
 }
 </style>
 </head>
@@ -1931,6 +1931,8 @@ document.addEventListener("DOMContentLoaded", function(){
 /* ===== 霓虹音乐盒播放逻辑 ===== */
 document.addEventListener("DOMContentLoaded", function(){
   var TRACKS = [
+    {src:"assets/music/track4.mp3", name:"命运战士"},
+    {src:"assets/music/track5.mp3", name:"怪兽の花呗"},
     {src:"assets/music/track1.mp3", name:"CYBER RAIN"},
     {src:"assets/music/track2.mp3", name:"NO WAY BACK"},
     {src:"assets/music/track3.mp3", name:"NIGHT DRIFT"}
@@ -1945,19 +1947,26 @@ document.addEventListener("DOMContentLoaded", function(){
   if(!box || !playBtn) return;
   // 音乐盒内点击不触发点击台词弹窗
   box.addEventListener("click", function(e){ e.stopPropagation(); });
-  var idx = 0, audio = null;
+  var idx = -1, audio = null, autoPending = false;
+  // 随机选一首（不与当前重复）
+  function pickNext(){
+    if(TRACKS.length < 2) return 0;
+    var n;
+    do{ n = Math.floor(Math.random() * TRACKS.length); }while(n === idx);
+    return n;
+  }
   function load(i){
-    idx = (i + TRACKS.length) % TRACKS.length;
+    idx = i;
     if(audio){ audio.pause(); audio.src = ""; }
     audio = new Audio(TRACKS[idx].src);
     audio.volume = parseFloat(vol.value);
-    audio.loop = true;
-    audio.addEventListener("ended", function(){ load(idx + 1); play(); });
+    audio.loop = false;
+    audio.addEventListener("ended", function(){ load(pickNext()); play(); });
     audio.addEventListener("error", function(){ titleEl.textContent = "SIGNAL LOST"; });
     titleEl.textContent = TRACKS[idx].name;
   }
   function play(){
-    if(!audio) load(0);
+    if(!audio) load(pickNext());
     var pr = audio.play();
     if(pr && pr.catch) pr.catch(function(){});
     box.classList.add("playing");
@@ -1968,23 +1977,38 @@ document.addEventListener("DOMContentLoaded", function(){
     box.classList.remove("playing");
     icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
   }
+  // 进入页面自动随机播放；被浏览器自动播放策略拦截时，在用户首次交互后播放
+  function autoStart(){
+    if(!audio) load(pickNext());
+    var pr = audio.play();
+    if(pr && pr.catch){
+      pr.catch(function(){
+        autoPending = true;
+        var startOnce = function(){
+          document.removeEventListener("click", startOnce);
+          document.removeEventListener("keydown", startOnce);
+          document.removeEventListener("touchstart", startOnce);
+          autoPending = false;
+          play();
+        };
+        document.addEventListener("click", startOnce);
+        document.addEventListener("keydown", startOnce);
+        document.addEventListener("touchstart", startOnce);
+      });
+    }
+    box.classList.add("playing");
+    icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+  }
   playBtn.addEventListener("click", function(){
-    if(!audio) load(0);
+    if(!audio) load(pickNext());
     if(box.classList.contains("playing")) pause();
     else play();
   });
-  prevBtn.addEventListener("click", function(){ load(idx - 1); play(); });
-  nextBtn.addEventListener("click", function(){ load(idx + 1); play(); });
+  prevBtn.addEventListener("click", function(){ load((idx < 0 ? 0 : idx - 1 + TRACKS.length) % TRACKS.length); play(); });
+  nextBtn.addEventListener("click", function(){ load((idx < 0 ? 0 : idx + 1) % TRACKS.length); play(); });
   vol.addEventListener("input", function(){ if(audio) audio.volume = parseFloat(vol.value); });
-  // 恢复上次播放曲目
-  try{
-    var saved = localStorage.getItem("keroro_music_track");
-    if(saved !== null){ load(parseInt(saved,10) || 0); }
-  }catch(e){}
-  // 切歌时记住
-  var remember = function(){ try{ localStorage.setItem("keroro_music_track", String(idx)); }catch(e){} };
-  prevBtn.addEventListener("click", remember);
-  nextBtn.addEventListener("click", remember);
+  // 进入页面自动随机播放
+  autoStart();
 });
 </script>
 
