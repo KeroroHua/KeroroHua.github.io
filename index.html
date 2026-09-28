@@ -1932,10 +1932,7 @@ document.addEventListener("DOMContentLoaded", function(){
 document.addEventListener("DOMContentLoaded", function(){
   var TRACKS = [
     {src:"assets/music/track4.mp3", name:"命运战士"},
-    {src:"assets/music/track5.mp3", name:"怪兽の花呗"},
-    {src:"assets/music/track1.mp3", name:"CYBER RAIN"},
-    {src:"assets/music/track2.mp3", name:"NO WAY BACK"},
-    {src:"assets/music/track3.mp3", name:"NIGHT DRIFT"}
+    {src:"assets/music/track5.mp3", name:"怪兽の花呗"}
   ];
   var box = document.getElementById("musicBox");
   var playBtn = document.getElementById("mbPlay");
@@ -1957,12 +1954,17 @@ document.addEventListener("DOMContentLoaded", function(){
   }
   function load(i){
     idx = i;
-    if(audio){ audio.pause(); audio.src = ""; }
+    if(audio){
+      audio.onended = null;
+      audio.onerror = null;
+      audio.pause();
+      audio.src = "";
+    }
     audio = new Audio(TRACKS[idx].src);
     audio.volume = parseFloat(vol.value);
     audio.loop = false;
-    audio.addEventListener("ended", function(){ load(pickNext()); play(); });
-    audio.addEventListener("error", function(){ titleEl.textContent = "SIGNAL LOST"; });
+    audio.onended = function(){ load(pickNext()); play(); };
+    audio.onerror = function(){ titleEl.textContent = TRACKS[idx].name + " · 信号中断"; };
     titleEl.textContent = TRACKS[idx].name;
   }
   function play(){
@@ -1981,9 +1983,13 @@ document.addEventListener("DOMContentLoaded", function(){
   function autoStart(){
     if(!audio) load(pickNext());
     var pr = audio.play();
-    if(pr && pr.catch){
-      pr.catch(function(){
+    if(pr && pr.then){
+      pr.then(function(){
+        box.classList.add("playing");
+        icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+      }, function(){
         autoPending = true;
+        titleEl.textContent = TRACKS[idx].name + " · 点击播放";
         var startOnce = function(){
           document.removeEventListener("click", startOnce);
           document.removeEventListener("keydown", startOnce);
@@ -1995,9 +2001,10 @@ document.addEventListener("DOMContentLoaded", function(){
         document.addEventListener("keydown", startOnce);
         document.addEventListener("touchstart", startOnce);
       });
+    } else {
+      box.classList.add("playing");
+      icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
     }
-    box.classList.add("playing");
-    icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
   }
   playBtn.addEventListener("click", function(){
     if(!audio) load(pickNext());
