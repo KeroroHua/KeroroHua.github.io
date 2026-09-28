@@ -570,6 +570,61 @@ body{
   -ms-user-select:text;
   user-select:text;
 }
+
+/* ===== 霓虹音乐盒 ===== */
+.music-box{
+  position:fixed;right:18px;bottom:76px;z-index:9990;
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;
+  background:rgba(8,10,20,.84);
+  border:1px solid rgba(0,229,255,.45);
+  border-radius:999px;
+  box-shadow:0 0 14px rgba(0,229,255,.25), inset 0 0 12px rgba(0,229,255,.08);
+  font-family:"Orbitron","Noto Sans SC",sans-serif;
+  color:#c9f6ff;letter-spacing:.05em;
+}
+.music-box .mb-btn{
+  width:30px;height:30px;border-radius:50%;
+  border:1px solid rgba(0,229,255,.6);
+  background:transparent;color:#00e5ff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s ease;padding:0;
+}
+.music-box .mb-btn:hover{background:rgba(0,229,255,.15);box-shadow:0 0 12px rgba(0,229,255,.4)}
+.music-box .mb-btn svg{width:14px;height:14px;fill:currentColor}
+.music-box .mb-title{
+  max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:#bff7ff;font-size:11px;letter-spacing:.06em;
+}
+.music-box .mb-vol{
+  width:62px;height:3px;-webkit-appearance:none;appearance:none;
+  background:rgba(0,229,255,.25);border-radius:2px;outline:none;cursor:pointer;
+}
+.music-box .mb-vol::-webkit-slider-thumb{
+  -webkit-appearance:none;width:10px;height:10px;border-radius:50%;
+  background:#00e5ff;box-shadow:0 0 8px rgba(0,229,255,.8);cursor:pointer;
+}
+.music-box .mb-vol::-moz-range-thumb{
+  width:10px;height:10px;border:none;border-radius:50%;
+  background:#00e5ff;box-shadow:0 0 8px rgba(0,229,255,.8);cursor:pointer;
+}
+.music-box.playing{
+  border-color:rgba(255,45,149,.6);
+  box-shadow:0 0 18px rgba(255,45,149,.35), inset 0 0 12px rgba(255,45,149,.1);
+}
+.music-box.playing .mb-btn{color:#ff2d95;border-color:rgba(255,45,149,.7)}
+.music-box .mb-spin{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid rgba(0,229,255,.2);border-top-color:#00e5ff;
+  animation:mbSpin 1s linear infinite;display:none;
+}
+.music-box.playing .mb-spin{display:block}
+@keyframes mbSpin{to{transform:rotate(360deg)}}
+@media (max-width:720px){
+  .music-box{right:10px;bottom:64px;padding:8px 10px;gap:8px}
+  .music-box .mb-vol{width:44px}
+  .music-box .mb-title{max-width:80px}
+}
 </style>
 </head>
 <body>
@@ -1872,6 +1927,65 @@ document.addEventListener("DOMContentLoaded", function(){
   loop();
 });
 
+
+/* ===== 霓虹音乐盒播放逻辑 ===== */
+document.addEventListener("DOMContentLoaded", function(){
+  var TRACKS = [
+    {src:"assets/music/track1.mp3", name:"CYBER RAIN"},
+    {src:"assets/music/track2.mp3", name:"NO WAY BACK"},
+    {src:"assets/music/track3.mp3", name:"NIGHT DRIFT"}
+  ];
+  var box = document.getElementById("musicBox");
+  var playBtn = document.getElementById("mbPlay");
+  var prevBtn = document.getElementById("mbPrev");
+  var nextBtn = document.getElementById("mbNext");
+  var vol = document.getElementById("mbVol");
+  var titleEl = document.getElementById("mbTitle");
+  var icon = document.getElementById("mbPlayIcon");
+  if(!box || !playBtn) return;
+  // 音乐盒内点击不触发点击台词弹窗
+  box.addEventListener("click", function(e){ e.stopPropagation(); });
+  var idx = 0, audio = null;
+  function load(i){
+    idx = (i + TRACKS.length) % TRACKS.length;
+    if(audio){ audio.pause(); audio.src = ""; }
+    audio = new Audio(TRACKS[idx].src);
+    audio.volume = parseFloat(vol.value);
+    audio.loop = true;
+    audio.addEventListener("ended", function(){ load(idx + 1); play(); });
+    audio.addEventListener("error", function(){ titleEl.textContent = "SIGNAL LOST"; });
+    titleEl.textContent = TRACKS[idx].name;
+  }
+  function play(){
+    if(!audio) load(0);
+    var pr = audio.play();
+    if(pr && pr.catch) pr.catch(function(){});
+    box.classList.add("playing");
+    icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+  }
+  function pause(){
+    if(audio) audio.pause();
+    box.classList.remove("playing");
+    icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  }
+  playBtn.addEventListener("click", function(){
+    if(!audio) load(0);
+    if(box.classList.contains("playing")) pause();
+    else play();
+  });
+  prevBtn.addEventListener("click", function(){ load(idx - 1); play(); });
+  nextBtn.addEventListener("click", function(){ load(idx + 1); play(); });
+  vol.addEventListener("input", function(){ if(audio) audio.volume = parseFloat(vol.value); });
+  // 恢复上次播放曲目
+  try{
+    var saved = localStorage.getItem("keroro_music_track");
+    if(saved !== null){ load(parseInt(saved,10) || 0); }
+  }catch(e){}
+  // 切歌时记住
+  var remember = function(){ try{ localStorage.setItem("keroro_music_track", String(idx)); }catch(e){} };
+  prevBtn.addEventListener("click", remember);
+  nextBtn.addEventListener("click", remember);
+});
 </script>
 
 <!-- ===== 换图面板 ===== -->
@@ -1957,5 +2071,15 @@ document.addEventListener("DOMContentLoaded", function(){
 <div class="neo-trail t1" aria-hidden="true"></div>
 <div class="neo-trail t2" aria-hidden="true"></div>
 <div class="neo-trail t3" aria-hidden="true"></div>
+
+<!-- ===== 霓虹音乐盒 ===== -->
+<div class="music-box" id="musicBox" aria-label="音乐盒">
+  <button class="mb-btn" id="mbPrev" type="button" aria-label="上一首"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+  <button class="mb-btn" id="mbPlay" type="button" aria-label="播放/暂停"><svg viewBox="0 0 24 24" id="mbPlayIcon"><path d="M8 5v14l11-7z"/></svg></button>
+  <button class="mb-btn" id="mbNext" type="button" aria-label="下一首"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+  <span class="mb-spin" aria-hidden="true"></span>
+  <span class="mb-title" id="mbTitle">CYBER RADIO</span>
+  <input class="mb-vol" id="mbVol" type="range" min="0" max="1" step="0.05" value="0.6" aria-label="音量">
+</div>
 </body>
 </html>
