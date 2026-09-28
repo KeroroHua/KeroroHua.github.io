@@ -625,9 +625,80 @@ body{
   .music-box .mb-vol{width:32px}
   .music-box .mb-title{max-width:60px}
 }
+
+/* ===== 故障风标题 Glitch ===== */
+.glitch{ position:relative; display:inline-block; z-index:0; }
+.glitch::before,.glitch::after{
+  content: attr(data-text);
+  position:absolute; left:0; top:0; width:100%; overflow:hidden;
+  pointer-events:none;
+}
+.glitch::before{ color:#ff2d95; z-index:-1; opacity:.9; animation: glitch-shift 3.1s infinite steps(2,end); }
+.glitch::after{ color:#00e5ff; z-index:-2; opacity:.9; animation: glitch-shift2 4.3s infinite steps(2,end); }
+@keyframes glitch-shift{
+  0%,84%,100%{ clip-path: inset(0 0 0 0); transform: translate(0,0); }
+  86%{ clip-path: inset(8% 0 82% 0); transform: translate(-5px,-2px); }
+  88%{ clip-path: inset(60% 0 12% 0); transform: translate(4px,1px); }
+  90%{ clip-path: inset(28% 0 52% 0); transform: translate(-3px,2px); }
+  92%{ clip-path: inset(80% 0 6% 0); transform: translate(5px,-1px); }
+  94%{ clip-path: inset(45% 0 40% 0); transform: translate(-2px,1px); }
+}
+@keyframes glitch-shift2{
+  0%,78%,100%{ clip-path: inset(0 0 0 0); transform: translate(0,0); }
+  80%{ clip-path: inset(55% 0 15% 0); transform: translate(4px,2px); }
+  82%{ clip-path: inset(10% 0 75% 0); transform: translate(-4px,-1px); }
+  85%{ clip-path: inset(70% 0 10% 0); transform: translate(3px,1px); }
+  88%{ clip-path: inset(35% 0 45% 0); transform: translate(-3px,-2px); }
+}
+
+/* ===== 开机加载画面 Preloader ===== */
+#preloader{
+  position:fixed; inset:0; z-index:9999; background:#04060d;
+  display:flex; align-items:center; justify-content:center;
+  transition:opacity .5s ease;
+}
+#preloader.done{ opacity:0; pointer-events:none; }
+.pl-inner{ width:min(520px,82vw); font-family:'Share Tech Mono',Consolas,monospace; color:#00e5ff; }
+.pl-line{ font-size:13px; line-height:1.9; color:#7df9ff; opacity:.9; text-shadow:0 0 8px rgba(0,229,255,.5); }
+.pl-bar{ height:12px; margin:16px 0 10px; border:1px solid rgba(0,229,255,.5); padding:2px; box-shadow:0 0 12px rgba(0,229,255,.25) inset; }
+.pl-bar i{ display:block; height:100%; width:0; background:linear-gradient(90deg,#00e5ff,#b44dff,#ff2d95); box-shadow:0 0 10px #00e5ff; transition:width .12s ease; }
+.pl-pct{ font-size:14px; color:#ff2d95; text-shadow:0 0 8px rgba(255,45,149,.6); }
+.pl-cursor{ display:inline-block; font-size:15px; color:#00e5ff; animation: pl-blink .7s steps(1) infinite; }
+@keyframes pl-blink{ 50%{ opacity:0; } }
+
+/* ===== 滚动浮现 Reveal ===== */
+.reveal{ opacity:0; transform:translateY(28px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.in{ opacity:1; transform:none; }
+
+/* ===== 路由切换故障过渡 ===== */
+.route-glitch{ animation: route-flick .3s steps(3) both; }
+@keyframes route-flick{
+  0%{ clip-path: inset(0 0 0 0); filter:none; }
+  33%{ clip-path: inset(12% 0 60% 0); filter: blur(1px) hue-rotate(20deg); }
+  66%{ clip-path: inset(60% 0 8% 0); filter: blur(2px) hue-rotate(-20deg); }
+  100%{ clip-path: inset(0 0 0 0); filter:none; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .glitch::before,.glitch::after{ display:none; }
+  .reveal{ opacity:1; transform:none; }
+  .pl-cursor{ animation:none; }
+}
+
 </style>
 </head>
 <body>
+<div id="preloader" aria-hidden="true">
+  <div class="pl-inner">
+    <div class="pl-line">&gt; SYSTEM BOOTING ...</div>
+    <div class="pl-line">&gt; LOADING CYBER CORE v4.2.1 ...</div>
+    <div class="pl-line">&gt; 技術宅、世界を救う ...</div>
+    <div class="pl-bar"><i id="plBarFill"></i></div>
+    <div class="pl-pct" id="plPct">0%</div>
+    <div class="pl-cursor">&#9608;</div>
+  </div>
+</div>
+
 
 <div class="bg-glow"></div>
 <div class="bg-grid"></div>
@@ -652,7 +723,7 @@ body{
     <div class="hero-bg"></div>
     <div class="hero-inner">
       <div class="kicker">SYSTEM :: AWAKEN MODE</div>
-      <h1>技術宅、世界を救う<span class="jp">NO WAY BACK</span></h1>
+      <h1 class="glitch" data-text="技術宅、世界を救う NO WAY BACK">技術宅、世界を救う<span class="jp">NO WAY BACK</span></h1>
       <p class="motto">不做选择，也是一种选择 —— <b>この世界は、俺が守る。</b></p>
       <div class="hero-cta">
         <a class="btn" href="#/posts">进入档案库</a>
@@ -2112,5 +2183,64 @@ document.addEventListener("DOMContentLoaded", function(){
   <span class="mb-title" id="mbTitle">CYBER RADIO</span>
   <input class="mb-vol" id="mbVol" type="range" min="0" max="1" step="0.05" value="0.6" aria-label="音量">
 </div>
+
+<script>
+/* ===== 开机加载画面逻辑 ===== */
+(function(){
+  var pl = document.getElementById("preloader");
+  if(!pl) return;
+  var fill = document.getElementById("plBarFill");
+  var pct = document.getElementById("plPct");
+  var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var p = 0;
+  function done(){
+    pl.classList.add("done");
+    setTimeout(function(){ if(pl.parentNode) pl.parentNode.removeChild(pl); }, 600);
+  }
+  if(rm){
+    if(fill) fill.style.width = "100%";
+    if(pct) pct.textContent = "100%";
+    setTimeout(done, 350);
+    return;
+  }
+  var step = function(){
+    p = Math.min(100, p + Math.random()*13 + 4);
+    if(fill) fill.style.width = p + "%";
+    if(pct) pct.textContent = Math.floor(p) + "%";
+    if(p < 100) setTimeout(step, 70 + Math.random()*60);
+    else setTimeout(done, 320);
+  };
+  setTimeout(step, 120);
+})();
+
+/* ===== 滚动浮现 Reveal ===== */
+(function(){
+  if(!("IntersectionObserver" in window)) return;
+  var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(rm) return; /* CSS 媒体查询已直接显示 */
+  var els = document.querySelectorAll(".hero-inner, .section, .about-strip, .post-grid");
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+    });
+  }, {threshold:0.12});
+  els.forEach(function(el){ el.classList.add("reveal"); io.observe(el); });
+})();
+
+/* ===== 路由切换故障过渡 ===== */
+(function(){
+  var main = document.querySelector("main");
+  if(!main) return;
+  var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(rm) return;
+  window.addEventListener("hashchange", function(){
+    main.classList.remove("route-glitch");
+    void main.offsetWidth;
+    main.classList.add("route-glitch");
+    setTimeout(function(){ main.classList.remove("route-glitch"); }, 340);
+  });
+})();
+</script>
+
 </body>
 </html>
