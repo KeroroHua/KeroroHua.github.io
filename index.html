@@ -639,13 +639,14 @@ body{
   width:118px;cursor:pointer;user-select:none;-webkit-user-select:none;
 }
 .web-pet .pet-img{
-  width:112px;height:112px;object-fit:cover;border-radius:26%;
+  width:112px;height:112px;object-fit:cover;
   mix-blend-mode:screen;pointer-events:none;
-  border:1px solid rgba(0,229,255,.25);
-  box-shadow:0 0 18px rgba(0,229,255,.18),0 8px 24px rgba(0,0,0,.45);
+  -webkit-mask-image:radial-gradient(ellipse 62% 58% at 50% 46%,#000 54%,transparent 78%);
+  mask-image:radial-gradient(ellipse 62% 58% at 50% 46%,#000 54%,transparent 78%);
+  filter:brightness(1.05) saturate(1.06);
   will-change:transform;
 }
-.web-pet:hover .pet-img{filter:brightness(1.12);border-color:rgba(255,45,149,.55);box-shadow:0 0 22px rgba(255,45,149,.32)}
+.web-pet:hover .pet-img{filter:brightness(1.16) saturate(1.1)}
 .pet-bubble{
   position:absolute;left:calc(100% + 12px);top:8px;width:max-content;max-width:200px;
   background:rgba(5,8,18,.94);border:1px solid rgba(0,229,255,.5);
@@ -2328,9 +2329,10 @@ document.addEventListener("DOMContentLoaded", function(){
     })(t0);
   }
   var hideTimer = null;
-  function show(){
+  var WELCOME = "老公你来啦❤";
+  function show(msg){
     if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; }
-    text.textContent = LINES[Math.floor(Math.random() * LINES.length)];
+    text.textContent = msg || LINES[Math.floor(Math.random() * LINES.length)];
     fade(bubble, 1, 180);
     hideTimer = setTimeout(function(){ fade(bubble, 0, 500); }, 2600);
   }
@@ -2339,6 +2341,8 @@ document.addEventListener("DOMContentLoaded", function(){
     e.stopPropagation();
     show();
   });
+  // 每次进入网页自动问候
+  setTimeout(function(){ show(WELCOME); }, 1400);
 })();
 
 /* ===== 开机加载画面逻辑 ===== */
