@@ -107,13 +107,13 @@ a:hover{color:#8ff4ff;text-shadow:var(--shadow-cyan)}
   position:absolute;inset:0;z-index:-1;
   background-image:url("assets/hero.jpg");
   background-size:cover;background-position:center 30%;
-  filter:saturate(1.15) contrast(1.06);
+  filter:saturate(1.12) contrast(1.05) brightness(.9);
 }
 .hero-bg::after{
   content:"";position:absolute;inset:0;
   background:
-    linear-gradient(180deg,rgba(5,6,13,.55) 0%,rgba(5,6,13,.72) 55%,var(--bg) 100%),
-    radial-gradient(70% 60% at 50% 30%,transparent 30%,rgba(5,6,13,.5) 100%);
+    linear-gradient(180deg,rgba(5,6,13,.64) 0%,rgba(5,6,13,.82) 55%,var(--bg) 100%),
+    radial-gradient(72% 62% at 50% 30%,transparent 20%,rgba(5,6,13,.62) 100%);
 }
 .hero-inner{position:relative;z-index:1;max-width:900px}
 .kicker{
@@ -162,12 +162,12 @@ a:hover{color:#8ff4ff;text-shadow:var(--shadow-cyan)}
   display:flex;align-items:center;gap:16px;margin:0 0 34px;
 }
 .sec-title .no{
-  font-family:"Orbitron",sans-serif;font-weight:800;font-size:15px;color:var(--purple);
+  font-family:"Orbitron",sans-serif;font-weight:800;font-size:17px;color:var(--purple);
   text-shadow:var(--shadow-purple);letter-spacing:.1em;
 }
 .sec-title h2{
-  font-size:clamp(22px,3.6vw,30px);font-weight:900;letter-spacing:.06em;color:#fff;
-  text-shadow:0 0 16px rgba(0,229,255,.3);
+  font-size:clamp(28px,4.6vw,40px);font-weight:900;letter-spacing:.08em;color:#fff;
+  text-shadow:0 0 18px rgba(0,229,255,.35);
 }
 .sec-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
 .section{padding:70px 0}
@@ -193,7 +193,8 @@ a:hover{color:#8ff4ff;text-shadow:var(--shadow-cyan)}
   font-family:"Orbitron","Noto Sans SC",sans-serif;letter-spacing:.05em;margin-bottom:14px;
 }
 .post-meta .tag{
-  padding:2px 10px;border:1px solid var(--line);color:var(--cyan);font-size:11.5px;
+  padding:3px 10px;border:1px solid rgba(0,229,255,.35);color:var(--cyan);
+  background:rgba(0,229,255,.08);border-radius:3px;font-size:11.5px;
   letter-spacing:.12em;
 }
 .post-card h3{font-size:21px;font-weight:900;color:#fff;line-height:1.5;margin-bottom:10px}
@@ -234,8 +235,11 @@ a:hover{color:#8ff4ff;text-shadow:var(--shadow-cyan)}
 .post-head .crumb a{color:var(--dim)}
 .post-head .crumb a:hover{color:var(--cyan)}
 .post-head h1{font-size:clamp(26px,4.6vw,38px);font-weight:900;color:#fff;line-height:1.4;text-shadow:0 0 18px rgba(0,229,255,.28)}
+#view-posts .post-head h1{font-size:clamp(32px,5.2vw,46px)}
 .post-head .meta{margin-top:16px;display:flex;gap:18px;flex-wrap:wrap;font-size:13.5px;color:var(--dim);font-family:"Orbitron","Noto Sans SC",sans-serif;letter-spacing:.06em}
-.post-head .meta .tag{padding:2px 12px;border:1px solid var(--line);color:var(--cyan);font-size:12.5px}
+#post-count{color:var(--cyan);font-weight:800;font-size:1.2em;font-family:"Orbitron","Noto Sans SC",sans-serif;text-shadow:0 0 10px rgba(0,229,255,.55)}
+#post-tag{display:inline-flex;gap:8px;flex-wrap:wrap;align-items:center}
+.post-head .meta .tag{padding:3px 12px;border:1px solid rgba(0,229,255,.35);color:var(--cyan);background:rgba(0,229,255,.08);border-radius:3px;font-size:12.5px}
 .post-body{max-width:820px;font-size:15.5px;color:var(--text)}
 .post-body h2{
   margin:38px 0 16px;font-size:22px;font-weight:900;color:#fff;letter-spacing:.05em;
@@ -270,7 +274,7 @@ a:hover{color:#8ff4ff;text-shadow:var(--shadow-cyan)}
 .post-body li{margin:6px 0}
 .post-body hr{border:none;height:1px;background:var(--line);margin:32px 0}
 .post-body em{color:var(--dim)}
-.post-body img{max-width:100%;border-radius:14px;border:1px solid rgba(0,229,255,.35);box-shadow:0 0 24px rgba(0,229,255,.15),0 12px 32px rgba(0,0,0,.45);margin:18px auto;display:block;animation:imgFade .9s ease both}
+.post-body img{max-width:88%;border-radius:12px;border:1px solid rgba(0,229,255,.4);box-shadow:0 0 28px rgba(0,229,255,.16),0 14px 40px rgba(0,0,0,.5);margin:22px auto;display:block;animation:imgFade .9s ease both}
 @keyframes imgFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){.post-body img{animation:none}}
 .post-back{margin:46px 0 20px}
@@ -305,7 +309,7 @@ footer .f-brand{font-family:"Orbitron",sans-serif;color:var(--cyan);font-size:14
 footer p{line-height:2}
 
 /* ===== Canvas 背景 ===== */
-#cyber-bg{position:fixed;inset:0;z-index:-1;pointer-events:none}
+#cyber-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.74}
 
 
 /* ===== 换图面板 ===== */
@@ -620,7 +624,14 @@ body{
   border:2px solid rgba(0,229,255,.2);border-top-color:#00e5ff;
   animation:mbSpin 1s linear infinite;display:none;
 }
-.music-box.playing .mb-spin{display:block}
+.music-box .mb-eq{display:none;align-items:flex-end;gap:2px;height:11px;margin-right:2px}
+.music-box .mb-eq i{width:3px;border-radius:1px;background:linear-gradient(180deg,#ff2d95,#00e5ff);animation:mbEq .9s ease-in-out infinite}
+.music-box .mb-eq i:nth-child(1){height:45%;animation-delay:-.3s}
+.music-box .mb-eq i:nth-child(2){height:90%;animation-delay:-.55s}
+.music-box .mb-eq i:nth-child(3){height:65%;animation-delay:-.15s}
+.music-box.playing .mb-eq{display:flex}
+@keyframes mbEq{0%,100%{transform:scaleY(.55)}50%{transform:scaleY(1)}}
+.music-box.playing .mb-spin{display:none}
 @keyframes mbSpin{to{transform:rotate(360deg)}}
 @media (max-width:720px){
   .music-box{right:8px;bottom:58px;padding:4px 7px;gap:5px}
@@ -779,7 +790,7 @@ body{
       <div class="meta">
         <span id="post-date"></span>
         <span id="post-cat"></span>
-        <span class="tag" id="post-tag"></span>
+        <span id="post-tag"></span>
       </div>
     </div>
     <div class="post-body" id="post-body"></div>
@@ -1856,9 +1867,10 @@ hexo deploy   # hexo will push the static files automatically into the specific 
 /* ===== 渲染 ===== */
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function cardHTML(p){
+  const tags = p.tag ? p.tag.split(",").map(t=>`<span class="tag">${esc(t.trim())}</span>`).join("") : "";
   return `<a class="post-card" href="#/post/${p.id}">
     <div>
-      <div class="post-meta"><span>${p.date}</span><span class="tag">${esc(p.tag)}</span></div>
+      <div class="post-meta"><span>${p.date}</span>${tags}</div>
       <h3>${esc(p.title)}</h3>
       <div class="excerpt">${esc(p.excerpt)}</div>
     </div>
@@ -1879,7 +1891,7 @@ function renderPost(id){
   document.getElementById("post-title").textContent = p.title;
   document.getElementById("post-date").textContent = p.date;
   document.getElementById("post-cat").textContent = p.cat;
-  document.getElementById("post-tag").textContent = p.tag;
+  document.getElementById("post-tag").innerHTML = p.tag ? p.tag.split(",").map(t=>`<span class="tag">${esc(t.trim())}</span>`).join("") : "";
   holder.innerHTML = p.body;
 }
 function navigate(){
@@ -2204,6 +2216,7 @@ document.addEventListener("DOMContentLoaded", function(){
   <button class="mb-btn" id="mbPlay" type="button" aria-label="播放/暂停"><svg viewBox="0 0 24 24" id="mbPlayIcon"><path d="M8 5v14l11-7z"/></svg></button>
   <button class="mb-btn" id="mbNext" type="button" aria-label="下一首"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
   <span class="mb-spin" aria-hidden="true"></span>
+  <span class="mb-eq" aria-hidden="true"><i></i><i></i><i></i></span>
   <span class="mb-title" id="mbTitle">CYBER RADIO</span>
   <input class="mb-vol" id="mbVol" type="range" min="0" max="1" step="0.05" value="0.6" aria-label="音量">
 </div>
