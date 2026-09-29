@@ -625,12 +625,11 @@ body{
   animation:mbSpin 1s linear infinite;display:none;
 }
 .music-box .mb-eq{display:none;align-items:flex-end;gap:2px;height:11px;margin-right:2px}
-.music-box .mb-eq i{width:3px;border-radius:1px;background:linear-gradient(180deg,#ff2d95,#00e5ff);animation:mbEq .9s ease-in-out infinite}
-.music-box .mb-eq i:nth-child(1){height:45%;animation-delay:-.3s}
-.music-box .mb-eq i:nth-child(2){height:90%;animation-delay:-.55s}
-.music-box .mb-eq i:nth-child(3){height:65%;animation-delay:-.15s}
+.music-box .mb-eq i{width:3px;border-radius:1px;background:linear-gradient(180deg,#ff2d95,#00e5ff);box-shadow:0 0 6px rgba(255,45,149,.55)}
+.music-box .mb-eq i:nth-child(1){height:45%}
+.music-box .mb-eq i:nth-child(2){height:90%}
+.music-box .mb-eq i:nth-child(3){height:65%}
 .music-box.playing .mb-eq{display:flex}
-@keyframes mbEq{0%,100%{transform:scaleY(.55)}50%{transform:scaleY(1)}}
 .music-box.playing .mb-spin{display:none}
 @keyframes mbSpin{to{transform:rotate(360deg)}}
 @media (max-width:720px){
@@ -2075,16 +2074,39 @@ document.addEventListener("DOMContentLoaded", function(){
   }
   function play(){
     if(!audio) load(pickNext());
-    if(audio && !audio.paused){ box.classList.add("playing"); return; }
+    if(audio && !audio.paused){ box.classList.add("playing"); eqStart(); return; }
     var pr = audio.play();
     if(pr && pr.catch) pr.catch(function(){});
     box.classList.add("playing");
     icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+    eqStart();
   }
   function pause(){
     if(audio) audio.pause();
     box.classList.remove("playing");
     icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    eqStop();
+  }
+  // EQ 律动：JS 驱动（不受 prefers-reduced-motion 影响，与点击台词同思路）
+  var eqBars = box.querySelectorAll(".mb-eq i");
+  var eqTimer = null;
+  function eqTick(){
+    eqBars.forEach(function(bar, k){
+      var base = [0.42, 0.95, 0.62][k % 3];
+      var wave = Math.sin(Date.now() / 170 + k * 1.9) * 0.3;
+      var rnd = (Math.random() - 0.5) * 0.24;
+      var h = Math.max(0.28, Math.min(1, base + wave + rnd));
+      bar.style.height = (h * 100).toFixed(1) + "%";
+    });
+  }
+  function eqStart(){
+    if(eqTimer) return;
+    eqTick();
+    eqTimer = setInterval(eqTick, 120);
+  }
+  function eqStop(){
+    if(eqTimer){ clearInterval(eqTimer); eqTimer = null; }
+    eqBars.forEach(function(b){ b.style.height = ""; });
   }
   // 进入页面自动随机播放；被浏览器自动播放策略拦截时，在用户首次交互后播放
   function autoStart(){
@@ -2094,6 +2116,7 @@ document.addEventListener("DOMContentLoaded", function(){
       pr.then(function(){
         box.classList.add("playing");
         icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+        eqStart();
       }, function(){
         autoPending = true;
         titleEl.textContent = TRACKS[idx].name + " · 点击播放";
@@ -2111,6 +2134,7 @@ document.addEventListener("DOMContentLoaded", function(){
     } else {
       box.classList.add("playing");
       icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+      eqStart();
     }
   }
   playBtn.addEventListener("click", function(){
