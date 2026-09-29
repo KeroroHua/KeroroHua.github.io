@@ -631,6 +631,42 @@ body{
 .music-box .mb-eq i:nth-child(3){height:65%}
 .music-box.playing .mb-eq{display:flex}
 .music-box.playing .mb-spin{display:none}
+
+/* ===== 清宵小桌宠 ===== */
+.web-pet{
+  position:fixed;left:14px;bottom:16px;z-index:8880;
+  display:flex;flex-direction:column;align-items:center;
+  width:118px;cursor:pointer;user-select:none;-webkit-user-select:none;
+}
+.web-pet .pet-img{
+  width:112px;height:112px;object-fit:cover;border-radius:26%;
+  mix-blend-mode:screen;pointer-events:none;
+  border:1px solid rgba(0,229,255,.25);
+  box-shadow:0 0 18px rgba(0,229,255,.18),0 8px 24px rgba(0,0,0,.45);
+  will-change:transform;
+}
+.web-pet:hover .pet-img{filter:brightness(1.12);border-color:rgba(255,45,149,.55);box-shadow:0 0 22px rgba(255,45,149,.32)}
+.pet-bubble{
+  position:absolute;left:calc(100% + 12px);top:8px;width:max-content;max-width:200px;
+  background:rgba(5,8,18,.94);border:1px solid rgba(0,229,255,.5);
+  border-radius:8px;padding:8px 11px;
+  font-size:12.5px;line-height:1.55;color:#d6f4ff;letter-spacing:.04em;
+  box-shadow:0 0 16px rgba(0,229,255,.22),0 6px 16px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;
+}
+.pet-bubble .arrow{
+  position:absolute;left:-7px;top:16px;
+  border:7px solid transparent;border-right-color:rgba(0,229,255,.5);
+}
+.web-pet .pet-shadow{
+  width:54px;height:9px;margin-top:-1px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,229,255,.3),transparent 70%);
+}
+@media (max-width:720px){
+  .web-pet{left:8px;bottom:10px;width:88px}
+  .web-pet .pet-img{width:82px;height:82px}
+  .pet-bubble{max-width:150px;font-size:11.5px}
+}
 @keyframes mbSpin{to{transform:rotate(360deg)}}
 @media (max-width:720px){
   .music-box{right:8px;bottom:58px;padding:4px 7px;gap:5px}
@@ -2245,7 +2281,66 @@ document.addEventListener("DOMContentLoaded", function(){
   <input class="mb-vol" id="mbVol" type="range" min="0" max="1" step="0.05" value="0.6" aria-label="音量">
 </div>
 
+<!-- ===== 清宵小桌宠 ===== -->
+<div class="web-pet" id="webPet" aria-label="清宵小桌宠">
+  <div class="pet-bubble" id="petBubble"><span id="petBubbleText"></span><i class="arrow"></i></div>
+  <img class="pet-img" src="assets/img/pet/qingxiao.jpg" alt="清宵" draggable="false">
+  <span class="pet-shadow" aria-hidden="true"></span>
+</div>
+
 <script>
+/* ===== 清宵小桌宠交互（JS 驱动动画，兼容 prefers-reduced-motion） ===== */
+(function(){
+  var pet = document.getElementById("webPet");
+  if(!pet) return;
+  var img = pet.querySelector(".pet-img");
+  var bubble = document.getElementById("petBubble");
+  var text = document.getElementById("petBubbleText");
+  var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var LINES = [
+    "凡尘琐事，一剑斩之。",
+    "龙角是本体，不是装饰，懂？",
+    "今天也要好好吃饭，修炼才有力气。",
+    "吾之剑气，可斩星河。",
+    "摸鱼一时爽，一直摸鱼一直爽。",
+    "晚上十点了，该睡了，明天还要搬砖。",
+    "窗外风雨正好，适合……睡觉。",
+    "这世界太大，好在我的剑够快。"
+  ];
+  // 待机浮动：rAF 正弦（reduced-motion 时减小幅度而非停掉）
+  var start = performance.now();
+  var amp = rm ? 1.5 : 5, rot = rm ? 0.3 : 1.3;
+  (function loop(now){
+    var t = (now - start) / 1000;
+    var y = Math.sin(t * 2.0) * amp;
+    var r = Math.sin(t * 1.3 + 1) * rot;
+    img.style.transform = "translateY(" + y.toFixed(2) + "px) rotate(" + r.toFixed(2) + "deg)";
+    requestAnimationFrame(loop);
+  })(start);
+  // 气泡淡入淡出（JS 驱动，不受 reduced-motion 全局规则影响）
+  function fade(el, to, ms, cb){
+    var from = parseFloat(el.style.opacity) || 0;
+    var t0 = performance.now();
+    (function step(now){
+      var k = Math.min(1, (now - t0) / ms);
+      el.style.opacity = String(from + (to - from) * k);
+      if(k < 1) requestAnimationFrame(step); else if(cb) cb();
+    })(t0);
+  }
+  var hideTimer = null;
+  function show(){
+    if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; }
+    text.textContent = LINES[Math.floor(Math.random() * LINES.length)];
+    fade(bubble, 1, 180);
+    hideTimer = setTimeout(function(){ fade(bubble, 0, 500); }, 2600);
+  }
+  // 点击桌宠：只弹气泡，不触发全局点击台词
+  pet.addEventListener("click", function(e){
+    e.stopPropagation();
+    show();
+  });
+})();
+
 /* ===== 开机加载画面逻辑 ===== */
 (function(){
   var pl = document.getElementById("preloader");
