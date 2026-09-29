@@ -2060,6 +2060,7 @@ document.addEventListener("DOMContentLoaded", function(){
   }
   function play(){
     if(!audio) load(pickNext());
+    if(audio && !audio.paused){ box.classList.add("playing"); return; }
     var pr = audio.play();
     if(pr && pr.catch) pr.catch(function(){});
     box.classList.add("playing");
