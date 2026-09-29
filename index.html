@@ -639,14 +639,16 @@ body{
   width:118px;cursor:pointer;user-select:none;-webkit-user-select:none;
 }
 .web-pet .pet-img{
-  width:112px;height:112px;object-fit:cover;
-  mix-blend-mode:screen;pointer-events:none;
-  -webkit-mask-image:radial-gradient(ellipse 62% 58% at 50% 46%,#000 56%,transparent 80%);
-  mask-image:radial-gradient(ellipse 62% 58% at 50% 46%,#000 56%,transparent 80%);
-  filter:brightness(1.34) saturate(1.2) drop-shadow(0 0 9px rgba(0,229,255,.38));
+  width:112px;height:112px;
+  background-image:url("assets/img/pet/qingxiao.jpg");
+  background-size:cover;background-position:center;
+  pointer-events:none;
+  -webkit-mask-image:radial-gradient(ellipse 60% 56% at 50% 46%,#000 62%,transparent 84%);
+  mask-image:radial-gradient(ellipse 60% 56% at 50% 46%,#000 62%,transparent 84%);
+  filter:brightness(1.3) saturate(1.18) drop-shadow(0 0 9px rgba(0,229,255,.42));
   will-change:transform;
 }
-.web-pet:hover .pet-img{filter:brightness(1.45) saturate(1.24) drop-shadow(0 0 14px rgba(255,45,149,.5))}
+.web-pet:hover .pet-img{filter:brightness(1.42) saturate(1.22) drop-shadow(0 0 14px rgba(255,45,149,.5))}
 .pet-bubble{
   position:absolute;left:calc(100% + 12px);top:8px;width:max-content;max-width:200px;
   background:rgba(9,14,30,.96);border:1px solid rgba(0,229,255,.65);
@@ -2285,7 +2287,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <!-- ===== 清宵小桌宠 ===== -->
 <div class="web-pet" id="webPet" aria-label="清宵小桌宠">
   <div class="pet-bubble" id="petBubble"><span id="petBubbleText"></span><i class="arrow"></i></div>
-  <img class="pet-img" src="assets/img/pet/qingxiao.jpg" alt="清宵" draggable="false">
+  <div class="pet-img" role="img" aria-label="清宵"></div>
   <span class="pet-shadow" aria-hidden="true"></span>
 </div>
 
