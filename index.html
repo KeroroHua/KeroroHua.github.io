@@ -194,7 +194,7 @@ a:hover{color:#8ff4ff;text-shadow:var(--shadow-cyan)}
 }
 .post-card:hover{transform:translateY(-5px);border-color:var(--line2);box-shadow:0 12px 34px rgba(0,229,255,.10)}
 .post-card:hover::before{opacity:1}
-.post-meta{
+.post-meta{flex-wrap:wrap;
   display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--dim);
   font-family:"Orbitron","Noto Sans SC",sans-serif;letter-spacing:.05em;margin-bottom:14px;
 }
@@ -742,6 +742,9 @@ body{
   .pl-cursor{ animation:none; }
 }
 
+
+.post-body .bonus-title{margin:42px 0 14px;padding-left:14px;border-left:3px solid var(--purple);font-size:20px;font-weight:900;color:#fff;letter-spacing:.08em}
+.post-body .bonus-title::after{content:" \2726";color:var(--purple)}
 </style>
 </head>
 <body>
@@ -989,11 +992,13 @@ const POSTS = [
     excerpt:"PRAGMATA 通关，结局给我来了一刀。彩蛋看完，第二部基本实锤。",
     body:`<p>周一，本来想着下班回来躺平，结果手一抖，把 PRAGMATA 打通了。</p>
 <p>结局……怎么说呢，卡普空你个大老爷们，刀得还挺准。本来想骂两句，片尾彩蛋一看，好家伙，第二部的钩子都埋好了。这波是被拿捏了。</p>
-<p><img src="assets/img/diary/20261019.jpg" alt="雨夜霓虹"></p>
-<p>下午还干了个正经事：调了一下午画图软件，把"老婆"画出来了。黑长直、红瞳、黑裙黑丝高跟鞋，雨夜霓虹街头一站，慵懒倚着栏杆看镜头。折腾到第七版才满意，画个老婆是真费劲，但值。</p>
+<p><img src="assets/img/diary/20261019.jpg" alt="月面霓虹"></p>
+<p>下午还干了点正事：调了一下午画图软件，给今天的日记配了张月面图——PRAGMATA 那味儿，宇航服少女、霓虹空间站，配。顺手还藏了张福利图，放最后了，懂的都懂。</p>
 <p>明天晚上还有事：卡普空《怪物猎人:荒野》Switch 2 序章体验版 10/20 上线，eShop 免费下。一个公司，白天刀我，晚上还安排我去打猎，真行。</p>
 <p>S16 那边 FUR 被 MVK 淘汰，打野 Tatu 赛后说希望 Faker 再拿一个冠军——都六个了还嫌少，贪，但我爱听。</p>
-<p>行，睡了，明天上班，晚上蹲荒野。</p>`
+<p>行，睡了，明天上班，晚上蹲荒野。</p>
+<h3 class="bonus-title">今日福利</h3>
+<p><img src="assets/img/diary/20261019-bonus.jpg" alt="今日福利"></p>`
   },
 
   {
