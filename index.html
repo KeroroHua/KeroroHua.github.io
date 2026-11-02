@@ -30533,7 +30533,7 @@ function toggleMonth(btn){
 
 
 
-  if(cards) cards.style.display=open?"none":"block";
+  if(cards){ if(open){ cards.style.display="none"; } else { cards.style.display=""; } }
 
 
 
